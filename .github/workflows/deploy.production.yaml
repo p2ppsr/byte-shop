@@ -1,0 +1,33 @@
+name: Production GAE Deployment
+on:
+  push:
+    branches:
+      - production
+jobs:
+  build:
+    name: GAE Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: "Create .env file"
+        run: "./scripts/mkenv.sh"
+        env:
+          NODE_ENV: ${{ secrets.PROD_NODE_ENV }}
+          ROUTING_PREFIX: ${{ secrets.PROD_ROUTING_PREFIX }}
+          HOSTING_DOMAIN: ${{ secrets.PROD_HOSTING_DOMAIN }}
+          KNEX_DB_CONNECTION: ${{ secrets.PROD_KNEX_DB_CONNECTION }}
+          KNEX_DB_CLIENT: ${{ secrets.PROD_KNEX_DB_CLIENT }}
+          MIGRATE_KEY: ${{ secrets.PROD_MIGRATE_KEY }}
+          GCP_PROJECT_ID: ${{ secrets.PROD_GCP_PROJECT_ID }}
+          SERVER_PAYMAIL: ${{ secrets.PROD_SERVER_PAYMAIL }}
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14.x'
+      - run: npm ci --quiet
+      - run: npm run build
+      - uses: google-github-actions/deploy-appengine@main
+        with:
+          credentials: ${{ secrets.gcp_deploy_creds }}
+          deliverables: app.production.yaml
+          

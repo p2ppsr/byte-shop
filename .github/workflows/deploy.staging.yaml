@@ -1,0 +1,33 @@
+name: Staging GAE Deployment
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    name: GAE Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: "Create .env file"
+        run: "./scripts/mkenv.sh"
+        env:
+          NODE_ENV: ${{ secrets.STAGING_NODE_ENV }}
+          ROUTING_PREFIX: ${{ secrets.STAGING_ROUTING_PREFIX }}
+          HOSTING_DOMAIN: ${{ secrets.STAGING_HOSTING_DOMAIN }}
+          KNEX_DB_CONNECTION: ${{ secrets.STAGING_KNEX_DB_CONNECTION }}
+          KNEX_DB_CLIENT: ${{ secrets.STAGING_KNEX_DB_CLIENT }}
+          MIGRATE_KEY: ${{ secrets.STAGING_MIGRATE_KEY }}
+          GCP_PROJECT_ID: ${{ secrets.STAGING_GCP_PROJECT_ID }}
+          SERVER_PAYMAIL: ${{ secrets.STAGING_SERVER_PAYMAIL }}
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14.x'
+      - run: npm ci --quiet
+      - run: npm run build
+      - uses: google-github-actions/deploy-appengine@main
+        with:
+          credentials: ${{ secrets.gcp_deploy_creds }}
+          deliverables: app.staging.yaml
+          

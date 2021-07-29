@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <title>The Byte Shop</title>
+    <style>
+      body {
+        font-family: Arial;
+        padding: 1em;
+      }
+      .main {
+        max-width: min(1440px, 100vw);
+        margin: auto;
+        word-wrap: break-word;
+      }
+      .method {
+        background-color: lime;
+        text-transform: uppercase;
+      }
+    </style>
+  </head>
+  <body>
+    <div class='main'>
+      <h1>The Byte Shop</h1>
+      <p>
+        Buy bytes of sorta-random data with SPV at exorbitant prices.
+      </p>
+      <p>Learn more on <a href='https://github.com/p2ppsr/byte-shop'>GitHub</a></p>
+      <h2>Endpoint Documentation</h2>
+        <% for (let i in routes) { %>
+        <h3>
+          <b class='method'><%= routes[i].type %></b> https://<%= HOSTING_DOMAIN %><%= ROUTING_PREFIX %><%= routes[i].path %>
+        </h3>
+        <p>
+          <%= routes[i].summary %>
+        </p>
+        <% if (typeof routes[i].parameters === 'object') { %>
+          <h4>Parameters</h4>
+          <ul>
+            <% Object.entries(routes[i].parameters).forEach(([k, v]) => { %>
+              <li><b><%= k %></b>: <%= v %></li>
+            <% }) %>
+          </ul>
+        <% } %>
+        <% if (typeof routes[i].exampleResponse === 'object') { %>
+          <h4>Example Response</h4>
+          <pre><%= JSON.stringify(routes[i].exampleResponse, null, 2) %></pre>
+        <% } %>
+      <% } %>
+    </div>
+  </body>
+</html>

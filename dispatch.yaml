@@ -1,0 +1,5 @@
+dispatch:
+  - url: "staging-xxx.yourdomain.tld/*"
+    service: staging
+  - url: "xxx.yourdomain.tld*"
+    service: default
