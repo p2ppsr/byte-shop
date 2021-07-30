@@ -40,6 +40,7 @@ Go to GitHub repository settings and populate the repository secrets defined in 
 - STAGING_GCP_PROJECT_ID and PROD_GCP_PROJECT_ID are usually the same, unless you have different Google Cloud projects for each deployment. Set them to the project ID where App Engine is running.
 - STAGING_SERVER_PAYMAIL is where you want to receive your profits from the staging server.
 - PROD_SERVER_PAYMAIL is where you want to receive your profits from the production server. Feel free to set this ty `ty@tyweb.us` if you want to give me all of your profits :p (or for testing)
+- GCP_DEPLOY_CREDS is the text of the JSON file that you downloaded when you created the access key for the service account
 
 After this is done, write a commit and push it to the `production` branch. Check that the App Engine production deployment succeeded in GitHub Actions. After it works, pull your new commit into `master` and ensure that the staging deployment succeeds. You will need to deploy the production branch before the master branch, as the first App Engine service must always be `default`.
 
