@@ -16,21 +16,34 @@ This works with legacy wallets as well, but will print warnings to the console i
 
 ## Setting Up
 
-This runs on the infinitely-scalable Google App Engine platform. You will need a database, an App Engine project and GitHub Actions configured for your repo.
+This runs on the infinitely-scalable Google App Engine platform. You will need a database, an App Engine project and GitHub Actions configured for your fork of this repo.
 
-Create a Google Cloud service account and download its credentials.
+You will need `gcloud` command line tools set up. You will need to run `gcloud auth login` and configure it to use the correct project. To do this, run `gcloud config configurations create your-cfg-name`, then `gcloud config set account your-email@domain.tld` and finally `gcloud config set project your-project-id`.
 
-Create a Cloud SQL instance (MySQL is what has been tested) and create a new user. Make note of the username, password, host name and the database you want to use.
+Create a Cloud SQL instance (MySQL is what has been tested) and create a new user. Also create a new database inside the new instance. Make note of the username, password, host name and database name you want to use. Alternatively, you can use another database hosting solution.
 
-You will need `gcloud` command line tools set up. You will need to run `gcloud login` and configure it to use the correct project.
+Go to the App Engine page and select a region. Use the same region as your Cloud SQL instance for best performance. Once the App Engine application has been created, go to Settings and add two custom domains: one for staging and one for production.
 
 Go to GitHub repository settings and populate the repository secrets defined in `.github/workflows/deploy.staging.yml` and `.github/workflows/deploy.production.yml`.
 
-Modify `dispatch.yml` in your fork of the repo with the domains you want to use. Deploy it with `gcloud app deploy dispatch.yml`
+- STAGING_NODE_ENV is `staging`
+- PROD_NODE_ENV is `production`
+- STAGING_ROUTING_PREFIX and PROD_ROUTING_PREFIX are not needed unless you want them
+- STAGING_HOSTING_DOMAIN is the domain name you configured for staging
+- PROD_HOSTING_DOMAIN is the domain name you configured for production
+- STAGING_KNEX_DB_CONNECTION is a JSON object describing the connection to your staging database. For example, `{"port":3306,"host":"10.1.1.1","user":"yourstagingusername","password":"yourstagingpassword","database":"your_staging_db"}`
+- PROD_KNEX_DB_CONNECTION is a JSON object describing the connection to your production database. For example, `{"port":3306,"host":"10.1.1.1","user":"yourprodusername","password":"yourprodpassword","database":"your_prod_db"}`
+- STAGING_KNEX_DB_CLIENT and PROD_KNEX_DB_CLIENT are both `mysql`
+- STAGING_MIGRATE_KEY and PROD_MIGRATE_KEY are the migration keys that can be used by the server administrator with the `/migrate` API endpoints to run new database migrations. Since staging and production use different databases, their migrations are handled separately, and different migration keys should be used for each.
+- STAGING_GCP_PROJECT_ID and PROD_GCP_PROJECT_ID are usually the same, unless you have different Google Cloud projects for each deployment. Set them to the project ID where App Engine is running.
+- STAGING_SERVER_PAYMAIL is where you want to receive your profits from the staging server.
+- PROD_SERVER_PAYMAIL is where you want to receive your profits from the production server. Feel free to set this ty `ty@tyweb.us` if you want to give me all of your profits :p (or for testing)
 
-You will need to deploy the production branch before the master branch, as the first service must always be `default`.
+After this is done, write a commit and push it to the `production` branch. Check that the App Engine production deployment succeeded in GitHub Actions. After it works, pull your new commit into `master` and ensure that the staging deployment succeeds. You will need to deploy the production branch before the master branch, as the first App Engine service must always be `default`.
 
-You will need to migrate both the staging and production databases to create the schema after deployment. Use the migrate route with the migration key you have configured.
+To get your custom domains to route to the right places, after your deploys are working, modify `dispatch.yaml` in your fork of the repo with the domains you set up earlier. Deploy the new routing rules from your loal terminal with `gcloud app deploy dispatch.yaml`. Commit the change to `master` and the staging deployment should run once more.
+
+Once your custom domains are working, you will need to migrate both the staging and production databases to create the schema after deployment. Use the `/migrate` API endpoints on both deployments with the migration keys you have configured.
 
 ## License
 
