@@ -24,6 +24,8 @@ Create a Cloud SQL instance (MySQL is what has been tested) and create a new use
 
 Go to the App Engine page and select a region. Use the same region as your Cloud SQL instance for best performance. Once the App Engine application has been created, go to Settings and add two custom domains: one for staging and one for production.
 
+In the search bar at the top of the Google Cloud console, search for "app Engine Admin API" and select the API from the list of results. On the API page, click "Enable" so that the service account has permission to create new deployments of the App Engine application.
+
 Go to GitHub repository settings and populate the repository secrets defined in `.github/workflows/deploy.staging.yml` and `.github/workflows/deploy.production.yml`.
 
 - STAGING_NODE_ENV is `staging`
