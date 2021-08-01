@@ -24,6 +24,10 @@ describe('createNewTransaction', () => {
         script: '001212',
         satoshis: 1337
       }],
+      fee: {
+        model: 'sat/kb',
+        value: 500
+      },
       reference: 'MOCK_REFNO'
     })
     jest.spyOn(console, 'error').mockImplementation(e => {
@@ -33,9 +37,7 @@ describe('createNewTransaction', () => {
     queryTracker = require('mock-knex').getTracker()
     queryTracker.install()
     validInput = {
-      fileId: 'MOCK_FILE_ID',
       amount: 1337,
-      numberOfMinutesPurchased: 90,
       knex
     }
   })
@@ -82,7 +84,11 @@ describe('createNewTransaction', () => {
             .toHex(),
           amount: 0
         }
-      ]
+      ],
+      fee: {
+        model: 'sat/kb',
+        value: 500
+      }
     })
   })
 })

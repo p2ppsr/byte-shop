@@ -43,17 +43,17 @@ module.exports = {
       if (!Number.isInteger(Number(numberOfBytes)) || numberOfBytes <= 0) {
         return res.status(400).json({
           status: 'error',
-          code: 'ERR_INVALID_SIZE',
+          code: 'ERR_INVALID_BYTES',
           description:
             'The number of bytes must be a positive integer.'
         })
       }
 
-      // Number of bytes must be 10 or more, but less than 65000
+      // Number of bytes must be 10 or more
       if (numberOfBytes < 10) {
         return res.status(400).json({
           status: 'error',
-          code: 'ERR_INVALID_SIZE',
+          code: 'ERR_INVALID_BYTES',
           description:
             'The number of bytes must be 10 or more. These are toilet paper, and it\'s March of 2020. You need to buy all the bytes before they are gone.'
         })
@@ -63,7 +63,7 @@ module.exports = {
       if (numberOfBytes > 65000) {
         return res.status(400).json({
           status: 'error',
-          code: 'ERR_INVALID_SIZE',
+          code: 'ERR_INVALID_BYTES',
           description:
             'I know you like bytes. But do you *really* need that many? We only have 65,000 left.'
         })

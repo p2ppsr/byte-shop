@@ -12,7 +12,7 @@ module.exports = {
   knex,
   summary: 'This is an administrative endpoint used by the server administrator to run any new database migrations and bring the database schema up-to-date.',
   parameters: {
-    migrateKey: 'The database migration key that was configured by the server administrator.'
+    migratekey: 'The database migration key that was configured by the server administrator.'
   },
   exampleResponse: {
     status: 'success'
