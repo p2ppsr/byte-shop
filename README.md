@@ -12,7 +12,9 @@ This is an open-source example of a merchant running a server to accept SPV paym
 
 It uses Paymail and the Babbage suite of tools. The merchant configures the server with their Paymail address, where they will receive their satoshis. The server proxies requests to Paymail, checking that the payments were accepted and furnishing the goods to the customer if so.
 
-This works with legacy wallets as well, but will print warnings to the console if the merchant's paymail server is incapable of accepting SPV envelopes. Wallets like MoneyButton and HandCash do not yet support SPV envelopes, but if you have a [Babbage Desktop](https://projectbabbage.com) account, you are good to go.
+Wallets like MoneyButton and HandCash do not yet support accepting SPV payments with Paymail, but if you download [Babbage Desktop](https://projectbabbage.com), you will be able to use your Paymail to receive the money.
+
+If you want to see support for this in other wallets, you should contact them and ask them to enable support for accepting SPV envelopes via Paymail, using capability code `e70928472537`, as documented on dojo.babbage.systems.
 
 ## Setting Up
 
