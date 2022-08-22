@@ -13,6 +13,12 @@
   color: white;
 }
 
+.App-input {
+  background-color: #8db5ea;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
 .App-link {
   color: #61dafb;
 }

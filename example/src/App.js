@@ -16,7 +16,7 @@ class BuyBytes extends React.Component {
           <label htmlFor="buy-how-many">
             How many bytes would you like to buy?
           </label>
-          <input
+          <input className="App-input"
             id="buy-how-many"
             onChange={this.handleChange}
             value={this.state.text}
