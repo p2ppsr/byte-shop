@@ -7,3 +7,5 @@ public/index.html
 app.production.yaml
 app.staging.yaml
 .npmrc
+
+/example/public/
