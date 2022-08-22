@@ -7,5 +7,6 @@ public/index.html
 app.production.yaml
 app.staging.yaml
 .npmrc
+.DS_Store
 
 /example/public/

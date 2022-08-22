@@ -14,9 +14,17 @@ It uses Paymail and the Babbage suite of tools. The merchant configures the serv
 
 Wallets like MoneyButton and HandCash do not yet support accepting SPV payments with Paymail, but if you download [Babbage Desktop](https://projectbabbage.com), you will be able to use your Paymail to receive the money.
 
-If you want to see support for this in other wallets, you should contact them and ask them to enable support for accepting SPV envelopes via Paymail, using capability code `e70928472537`, as documented on dojo.babbage.systems.
+## Spinning Up for Local Development
 
-## Setting Up
+To use this locally (such as when you are extending / modifying it, or adding features), you can follow these steps:
+
+1. Clone the repo onto your machine
+2. Run `npm i` to install dependencies
+3. Copy the `.env.example` file to a new file called `.env`
+4. Run `npm run dev` and the local ByteShop server will be available on port `8080`
+5. Optionally, change the Dojo URL, identity key and/or Paymail handle where payment is sent
+
+## Deploying to Google Cloud
 
 This runs on the infinitely-scalable Google App Engine platform. You will need a database, an App Engine project and GitHub Actions configured for your fork of this repo.
 
