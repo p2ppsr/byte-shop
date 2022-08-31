@@ -1,25 +1,31 @@
 /* eslint-disable import/no-anonymous-default-export */
 import './App.css';
 import React, { useState } from 'react'
-import invoice from './utils/invoice'
+import requestInvoice from './utils/invoice'
+import payInvoice from './utils/buy'
 
 export default () => {
   const [text, setText] = useState('')
   const [buying, setBuying] = useState('')
   const [error, setError] = useState(null)
+  const [invoice, setInvoice] = useState(null)
+  const [bytes, setBytes] = useState(null)
+  const [note, setNote] = useState('')
 
   const serverURL = window.location.host.startsWith('localhost')
-      ? 'http://192.168.0.202:8080'
+      ? 'http://localhost:8080'
       : 'https://<todo>'
 
   const handleBuyHowManyChange = e => {
     setText(e.target.value)
   }
 
-  const resetFromError = e => {
+  const resetFromTop = e => {
+    setError(null)
     setText('')
     setBuying('')
-    setError(null)
+    setInvoice(null)
+    setBytes(null)
   }
 
   const handleGetInvoice = async e => {
@@ -30,13 +36,38 @@ export default () => {
       setBuying(numberOfBytes)
       setText()
 
-      const invoiceResult = await invoice({
+      const newInvoice = await requestInvoice({
         numberOfBytes,
-        config: {
-          serverURL
-        }
+        config: { serverURL }
       })
-      console.log('App():invoiceResult:', invoiceResult)
+      console.log('App():invoiceResult:', invoice)
+      setBuying('')
+      setInvoice(newInvoice)
+
+    } catch (e) {
+      console.error(e)
+      if (e.response && e.response.data && e.response.data.description) {
+        setError(e.response.data.description)
+      } else {
+        setError(e.message)
+      }
+    }
+  }
+
+  const handlePayInvoice = async e => {
+    e.preventDefault();
+    try {
+    const payResult = await payInvoice({
+      config: { serverURL },
+      description: `Payment for ${invoice.numberOfBytes}.`,
+      orderID: invoice.orderId,
+      recipientPublicKey: invoice.identityKey,
+      amount: invoice.amount
+    })
+    console.log('App():payInvoice:', payResult)
+    setBytes(payResult.bytes)
+    setNote(payResult.note)
+
     } catch (e) {
       console.error(e)
       if (e.response && e.response.data && e.response.data.description) {
@@ -50,7 +81,7 @@ export default () => {
   return (
       <div className="App">
         <header className="App-header">
-      {buying === '' && (
+      {buying === '' && invoice === null && error === null && (
         <form onSubmit={handleGetInvoice}>
           <label htmlFor="buy-how-many">
             How many bytes would you like to buy?
@@ -60,15 +91,30 @@ export default () => {
             onChange={handleBuyHowManyChange}
             value={text}
           />
+          <button className="App-input" type="submit">Buy</button>
         </form>
       )}
-      {buying !== '' && (
-        <p>Buying {buying}</p>
+      {buying !== '' && error === null && (
+        <p>Buying {buying} ...</p>
+      )}
+      {invoice !== null && bytes === null && error === null && (
+        <div>
+          <p>Number of bytes: {invoice.numberOfBytes}</p>
+          <p>Amount: {invoice.amount}</p>
+          <button className="App-input" onClick={handlePayInvoice}>Pay Invoice</button>
+        </div>
+      )}
+      {invoice !== null && bytes !== null && error === null && (
+        <div>
+          <p>Bytes: {bytes}</p>
+          <button className="App-input" onClick={resetFromTop}>Reset</button>
+          <p>Note: {note}</p>
+        </div>
       )}
       {error !== null && (
         <div>
           <p>Error: {error}</p>
-          <button onClick={resetFromError}>Reset</button>
+          <button className="App-input" onClick={resetFromTop}>Reset</button>
         </div>
       )}
       </header>

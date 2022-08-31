@@ -101,7 +101,8 @@ module.exports = {
         message: 'Use /buy to submit the payment.',
         identityKey: bsv.PrivateKey.fromHex(SERVER_PRIVATE_KEY).publicKey.toString(),
         amount,
-        orderId
+        orderId,
+        numberOfBytes
       })
     } catch (e) {
       console.error(e)
