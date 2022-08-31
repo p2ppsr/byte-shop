@@ -1,5 +1,6 @@
 import './App.css';
 import React from 'react'
+import { invoice, buy } from 'byte-shop'
 
 class BuyBytes extends React.Component {
   constructor(props) {
@@ -40,13 +41,16 @@ class BuyBytes extends React.Component {
     this.setState({ text: e.target.value })
   }
 
-  handleSubmit(e) {
+  async handleSubmit(e) {
     e.preventDefault();
     if (this.state.text.length === 0) return;
     this.setState(state => ({
       text: '',
       buying: state.text
     }))
+    const invoiceResult = await invoice({
+      numberOfBytes: this.state.buying
+    })
   }
 }
 
