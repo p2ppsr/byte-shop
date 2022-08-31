@@ -1,6 +1,84 @@
+/* eslint-disable import/no-anonymous-default-export */
 import './App.css';
-import React from 'react'
-import { invoice, buy } from 'byte-shop'
+import React, { useState } from 'react'
+import invoice from './utils/invoice'
+
+export default () => {
+  const [text, setText] = useState('')
+  const [buying, setBuying] = useState('')
+  const [error, setError] = useState(null)
+
+  const serverURL = window.location.host.startsWith('localhost')
+      ? 'http://192.168.0.202:8080'
+      : 'https://<todo>'
+
+  const handleBuyHowManyChange = e => {
+    setText(e.target.value)
+  }
+
+  const resetFromError = e => {
+    setText('')
+    setBuying('')
+    setError(null)
+  }
+
+  const handleGetInvoice = async e => {
+    e.preventDefault();
+    try {
+      if (text.length === 0) return;
+      const numberOfBytes = text
+      setBuying(numberOfBytes)
+      setText()
+
+      const invoiceResult = await invoice({
+        numberOfBytes,
+        config: {
+          serverURL
+        }
+      })
+      console.log('App():invoiceResult:', invoiceResult)
+    } catch (e) {
+      console.error(e)
+      if (e.response && e.response.data && e.response.data.description) {
+        setError(e.response.data.description)
+      } else {
+        setError(e.message)
+      }
+    }
+  }
+
+  return (
+      <div className="App">
+        <header className="App-header">
+      {buying === '' && (
+        <form onSubmit={handleGetInvoice}>
+          <label htmlFor="buy-how-many">
+            How many bytes would you like to buy?
+          </label>
+          <input className="App-input"
+            id="buy-how-many"
+            onChange={handleBuyHowManyChange}
+            value={text}
+          />
+        </form>
+      )}
+      {buying !== '' && (
+        <p>Buying {buying}</p>
+      )}
+      {error !== null && (
+        <div>
+          <p>Error: {error}</p>
+          <button onClick={resetFromError}>Reset</button>
+        </div>
+      )}
+      </header>
+    </div>
+  )
+}
+
+/*
+          <input type='button' onClick={resetFromError}>Reset</input>
+          <Button onPress={resetFromError} title='Reset' />
 
 class BuyBytes extends React.Component {
   constructor(props) {
@@ -67,3 +145,4 @@ class App extends React.Component {
 }
 
 export default App;
+*/

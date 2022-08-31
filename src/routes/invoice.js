@@ -1,7 +1,18 @@
+const crypto = require('crypto')
+const bsv = require('bsv')
+
+const {
+  SERVER_PRIVATE_KEY,
+  HOSTING_DOMAIN,
+  ROUTING_PREFIX,
+  NODE_ENV
+} = process.env
+
 const knex =
   process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging'
     ? require('knex')(require('../../knexfile.js').production)
     : require('knex')(require('../../knexfile.js').development)
+
 const createNewTransaction = require('../utils/createNewTransaction')
 
 module.exports = {
@@ -70,23 +81,34 @@ module.exports = {
       }
 
       // Create a new transaction, the amount is 100 * the number of bytes
-      const { reference, outputs, fee } = await createNewTransaction({
-        amount: numberOfBytes * 100,
-        knex
+      const orderId = crypto.randomBytes(32).toString('base64')
+      const amount = numberOfBytes * 100
+      const when = new Date()
+      await knex('transaction').insert({
+        created_at: when,
+        updated_at: when,
+        orderId,
+        numberOfBytes,
+        amount,
+        identityKey: req.authrite.identityKey,
+        reference: null,
+        paid: false
       })
 
-      // Return the reference number, fee and outputs
-      res.status(200).json({
-        reference,
-        outputs,
-        fee
+      // Return the required info to the sender
+      return res.status(200).json({
+        status: 'success',
+        message: 'Use /buy to submit the payment.',
+        identityKey: bsv.PrivateKey.fromHex(SERVER_PRIVATE_KEY).publicKey.toString(),
+        amount,
+        orderId
       })
     } catch (e) {
       console.error(e)
       return res.status(500).json({
         status: 'error',
-        code: 'ERR_INTERNAL',
-        description: 'An internal error has occurred.'
+        code: 'ERR_INTERNAL_PROCESSING_INVOICE',
+        description: 'An internal error has occurred while processing invoice.'
       })
     }
   }

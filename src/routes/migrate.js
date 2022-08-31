@@ -21,7 +21,7 @@ module.exports = {
     'ERR_UNAUTHORIZED'
   ],
   func: async (req, res) => {
-    // req.body = { migratekey: 'my-great-key'}
+     req.body = { migratekey: 'my-great-key'}
     if (
       typeof MIGRATE_KEY === 'string' &&
       MIGRATE_KEY.length > 10 &&
