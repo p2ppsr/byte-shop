@@ -60,7 +60,7 @@ export default () => {
     const payResult = await payInvoice({
       config: { serverURL },
       description: `Payment for ${invoice.numberOfBytes}.`,
-      orderID: invoice.orderId,
+      orderId: invoice.orderId,
       recipientPublicKey: invoice.identityKey,
       amount: invoice.amount
     })

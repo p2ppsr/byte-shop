@@ -34,7 +34,7 @@ module.exports = {
       // Find valid request transaction
       const [transaction] = await knex('transaction').where({
         identityKey: req.authrite.identityKey,
-        orderID: req.body.orderId
+        orderId: req.body.orderId
       })
       // console.log('transaction:', transaction)
       if (!transaction) {
@@ -88,13 +88,14 @@ module.exports = {
         .update({
           reference: processedTransaction.reference,
           paid: true,
+          txid: processedTransaction.txid,
           updated_at: new Date()
         })
 
       const bytes = require('crypto').randomBytes(transaction.numberOfBytes)
       return res.status(200).json({
         bytes: bytes.toString('hex'),
-        note: `Thanks for doing business with the byte shop! By the way... have you ever heard of require("cryoto").randomBytes(${transaction.numberOfBytes})?`
+        note: `Thanks for doing business with the byte shop! By the way... have you ever heard of require("crypto").randomBytes(${transaction.numberOfBytes})?`
       })
 
     } catch (e) {

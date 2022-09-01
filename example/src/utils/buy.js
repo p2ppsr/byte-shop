@@ -18,7 +18,7 @@ const { CONFIG } = require('./defaults')
 module.exports = async ({
   config = CONFIG,
   description,
-  orderID,
+  orderId,
   recipientPublicKey,
   amount
 } = {}) => {
@@ -56,7 +56,7 @@ module.exports = async ({
     config,
     path: '/buy',
     body: {
-      orderID,
+      orderId,
       transaction: {
         ...payment,
         outputs: [{
