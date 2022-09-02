@@ -1,7 +1,7 @@
 const invoice = require('../invoice')
-const createNewTransaction = require('../../utils/createNewTransaction')
+//const createNewTransaction = require('../../utils/createNewTransaction')
 
-jest.mock('../../utils/createNewTransaction')
+//jest.mock('../../utils/createNewTransaction')
 
 const mockRes = {}
 mockRes.status = jest.fn(() => mockRes)
@@ -13,6 +13,7 @@ describe('invoice', () => {
     jest.spyOn(console, 'error').mockImplementation(e => {
       throw e
     })
+    /*
     createNewTransaction.mockReturnValue({
       outputs: [
         { amount: 2250, outputScript: 'MOCK_OS_1' },
@@ -24,6 +25,7 @@ describe('invoice', () => {
         value: 500
       }
     })
+    */
     validReq = {
       body: {
         numberOfBytes: 1337

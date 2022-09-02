@@ -13,7 +13,7 @@ const knex =
     ? require('knex')(require('../../knexfile.js').production)
     : require('knex')(require('../../knexfile.js').development)
 
-const createNewTransaction = require('../utils/createNewTransaction')
+//const createNewTransaction = require('../utils/createNewTransaction')
 
 module.exports = {
   type: 'post',
@@ -85,14 +85,13 @@ module.exports = {
       const amount = numberOfBytes * 100
       const when = new Date()
       await knex('transaction').insert({
-        created_at: when,
-        updated_at: when,
-        orderId,
         numberOfBytes,
         amount,
+        orderId,
+        paid: false,
         identityKey: req.authrite.identityKey,
-        reference: null,
-        paid: false
+        created_at: when,
+        updated_at: when
       })
 
       // Return the required info to the sender

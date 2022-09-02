@@ -71,6 +71,9 @@ module.exports = {
         note: req.body.description,
         amount: transaction.amount
       })
+      // This is not an adequate failure test...
+      if (processedTransaction && processedTransaction.message)
+        console.log(`ninja.submitDirectTransaction message=${processedTransaction.message}`)
       if (!processedTransaction) {
         return res.status(400).json({
           status: 'error',
@@ -78,6 +81,8 @@ module.exports = {
           description: 'Could not validate payment!'
         })
       }
+
+      const bytes = require('crypto').randomBytes(transaction.numberOfBytes)
 
       // Update transaction
       await knex('transaction').where({
@@ -88,11 +93,11 @@ module.exports = {
         .update({
           reference: processedTransaction.reference,
           paid: true,
-          txid: processedTransaction.txid,
+          txid: req.body.transaction.txid,
+          bytes,
           updated_at: new Date()
         })
 
-      const bytes = require('crypto').randomBytes(transaction.numberOfBytes)
       return res.status(200).json({
         bytes: bytes.toString('hex'),
         note: `Thanks for doing business with the byte shop! By the way... have you ever heard of require("crypto").randomBytes(${transaction.numberOfBytes})?`

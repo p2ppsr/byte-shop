@@ -22,58 +22,58 @@ module.exports = async ({
   recipientPublicKey,
   amount
 } = {}) => {
-  // Pay the host for some bytes, this return the txid.
-  const derivationPrefix = require('crypto').randomBytes(10).toString('base64')
-  const derivationSuffix = require('crypto').randomBytes(10).toString('base64')
+    // Pay the host for some bytes, this return the txid.
+    const derivationPrefix = require('crypto').randomBytes(10).toString('base64')
+    const derivationSuffix = require('crypto').randomBytes(10).toString('base64')
 
-  // Derive the public key used for creating the output script
-  const derivedPublicKey = await getPublicKey({
-    protocolID: [2, '3241645161d8'],
-    keyID: `${derivationPrefix} ${derivationSuffix}`,
-    counterparty: recipientPublicKey
-  })
+    // Derive the public key used for creating the output script
+    const derivedPublicKey = await getPublicKey({
+      protocolID: [2, '3241645161d8'],
+      keyID: `${derivationPrefix} ${derivationSuffix}`,
+      counterparty: recipientPublicKey
+    })
 
-  // Create an output script that can only be unlocked with the corresponding derived private key
-  const script = new bsv.Script(
-    bsv.Script.fromAddress(bsv.Address.fromPublicKey(
-      bsv.PublicKey.fromString(derivedPublicKey)
-    ))
-  ).toHex()
-  const payment = await createAction({
-    description,
-    outputs: [{
-      script,
-      satoshis: amount
-    }]
-  })
-  if (payment.status === 'error') {
-    const e = new Error(payment.description)
-    e.code = payment.code
-    throw e
-  }
-  // console.log('payment:', payment)
-  const buy = await createSignedRequest({
-    config,
-    path: '/buy',
-    body: {
-      orderId,
-      transaction: {
-        ...payment,
-        outputs: [{
-          vout: 0,
-          satoshis: amount,
-          derivationPrefix,
-          derivationSuffix
-        }]
-      },
-      description
+    // Create an output script that can only be unlocked with the corresponding derived private key
+    const script = new bsv.Script(
+      bsv.Script.fromAddress(bsv.Address.fromPublicKey(
+        bsv.PublicKey.fromString(derivedPublicKey)
+      ))
+    ).toHex()
+    const payment = await createAction({
+      description,
+      outputs: [{
+        script,
+        satoshis: amount
+      }]
+    })
+    if (payment.status === 'error') {
+      const e = new Error(payment.description)
+      e.code = payment.code
+      throw e
     }
-  })
-  // console.log('buy:', buy)
-  if (buy.status === 'error') {
-    const e = new Error(buy.description)
-    e.code = buy.code
-    throw e
-  }
-  return buy
+    // console.log('payment:', payment)
+    const buy = await createSignedRequest({
+      config,
+      path: '/buy',
+      body: {
+        orderId,
+        transaction: {
+          ...payment,
+          outputs: [{
+            vout: 0,
+            satoshis: amount,
+            derivationPrefix,
+            derivationSuffix
+          }]
+        },
+        description
+      }
+    })
+    // console.log('buy:', buy)
+    if (buy.status === 'error') {
+      const e = new Error(buy.description)
+      e.code = buy.code
+      throw e
+    }
+    return buy
 }
