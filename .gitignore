@@ -9,4 +9,3 @@ app.staging.yaml
 .npmrc
 .DS_Store
 
-/example/public/
