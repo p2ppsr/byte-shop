@@ -8,7 +8,7 @@ const { CONFIG } = require('./defaults')
  * @param {Object} obj.config config object, see config section.
  * @param {Number} obj.numberOfBytes The how many bytes to buy.
   *
- * @returns {Promise<Object>} The invoice object, containing `message` giving details, `identityKey` receipient's private key, `amount` (satoshis), `ORDER_ID`, for referencing this contract payment and passed to the `buy` function, and the `status`.
+ * @returns {Promise<Object>} The invoice object, containing `message` giving details, `identityKey` receipient's private key, `amount` (satoshis), `orderID`, for referencing this contract payment and passed to the `buy` function, and the `status`.
  */
 module.exports = async ({ config = CONFIG, numberOfBytes } = {}) => {
   // Send a request to get the invoice
