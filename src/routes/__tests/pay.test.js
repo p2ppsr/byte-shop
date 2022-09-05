@@ -1,3 +1,4 @@
+/* eslint-env jest */
 const pay = require('../pay')
 const mockKnex = require('mock-knex')
 const bsv = require('bsv')
@@ -126,7 +127,7 @@ describe('pay', () => {
     queryTracker.on('query', (q, s) => {
       if (s === 1) {
         q.response([validTx])
-      } else  {
+      } else {
         q.response([])
       }
     })

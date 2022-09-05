@@ -1,3 +1,4 @@
+/* eslint-env jest */
 const invoice = require('../invoice')
 const createNewTransaction = require('../../utils/createNewTransaction')
 
