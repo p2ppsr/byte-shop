@@ -69,7 +69,7 @@ preAuthrite.filter(x => x.unsecured).forEach((route) => {
   app[route.type](`${ROUTING_PREFIX}${route.path}`, route.func)
 })
 
-// Secured pre-Authrite routes are added after the HTTPS redirect
+// Secured pre-Authrite routes are then added
 preAuthrite.filter(x => !x.unsecured).forEach((route) => {
   app[route.type](`${ROUTING_PREFIX}${route.path}`, route.func)
 })
@@ -85,6 +85,7 @@ postAuthrite.filter(x => !x.unsecured).forEach((route) => {
   app[route.type](`${ROUTING_PREFIX}${route.path}`, route.func)
 })
 
+// route not found error returned
 app.use((req, res) => {
   console.log('404', req.url)
   res.status(404).json({
