@@ -2,6 +2,7 @@ node_modules
 data/byteshop-mysql-data
 .env
 docker-compose.yml
+dispatch.yaml
 yarn-error.log
 yarn.lock
 public/index.html
