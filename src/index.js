@@ -4,7 +4,6 @@ const bodyparser = require('body-parser')
 const prettyjson = require('prettyjson')
 const { preAuthrite, postAuthrite } = require('./routes')
 const authrite = require('authrite-express')
-
 const {
   NODE_ENV,
   PORT,
@@ -16,7 +15,6 @@ if (NODE_ENV !== 'development') {
     serviceContext: { enableCanary: false }
   })
 }
-
 const HTTP_PORT = PORT || process.env.HTTP_PORT || 8080
 const ROUTING_PREFIX = process.env.ROUTING_PREFIX || ''
 const app = express()
@@ -48,6 +46,7 @@ app.use((req, res, next) => {
   }
 })
 
+// logger
 app.use((req, res, next) => {
   console.log('[' + req.method + '] <- ' + req._parsedUrl.pathname)
   const logObject = { ...req.body }
@@ -67,30 +66,12 @@ app.use(express.static('public'))
 
 // Cycle through pre-authrite routes
 preAuthrite.filter(x => x.unsecured).forEach((route) => {
-  // If we need middleware for a route, attach it
-  if (route.middleware) {
-    app[route.type](
-      `${ROUTING_PREFIX}${route.path}`,
-      route.middleware,
-      route.func
-    )
-  } else {
-    app[route.type](`${ROUTING_PREFIX}${route.path}`, route.func)
-  }
+  app[route.type](`${ROUTING_PREFIX}${route.path}`, route.func)
 })
 
 // Secured pre-Authrite routes are added after the HTTPS redirect
 preAuthrite.filter(x => !x.unsecured).forEach((route) => {
-  // If we need middleware for a route, attach it
-  if (route.middleware) {
-    app[route.type](
-      `${ROUTING_PREFIX}${route.path}`,
-      route.middleware,
-      route.func
-    )
-  } else {
-    app[route.type](`${ROUTING_PREFIX}${route.path}`, route.func)
-  }
+  app[route.type](`${ROUTING_PREFIX}${route.path}`, route.func)
 })
 
 // Authrite is enforced from here forward
@@ -101,16 +82,7 @@ app.use(authrite.middleware({
 
 // Secured, post-Authrite routes are added
 postAuthrite.filter(x => !x.unsecured).forEach((route) => {
-  // If we need middleware for a route, attach it
-  if (route.middleware) {
-    app[route.type](
-      `${ROUTING_PREFIX}${route.path}`,
-      route.middleware,
-      route.func
-    )
-  } else {
-    app[route.type](`${ROUTING_PREFIX}${route.path}`, route.func)
-  }
+  app[route.type](`${ROUTING_PREFIX}${route.path}`, route.func)
 })
 
 app.use((req, res) => {
