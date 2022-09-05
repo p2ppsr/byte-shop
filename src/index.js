@@ -123,5 +123,5 @@ app.use((req, res) => {
 
 // This starts the API server listening for requests
 app.listen(HTTP_PORT, () => {
-  console.log('ByteShop listening on port', HTTP_PORT)
+  console.log('Byte-Shop listening on port', HTTP_PORT)
 })
