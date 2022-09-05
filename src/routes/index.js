@@ -1,5 +1,9 @@
-module.exports = [
-  require('./invoice'),
-  require('./buy'),
-  require('./migrate')
-]
+module.exports = {
+  preAuthrite: [
+    require('./migrate')
+  ],
+  postAuthrite: [
+    require('./pay'),
+    require('./invoice')
+  ]
+}

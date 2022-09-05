@@ -1,4 +1,5 @@
-const buy = require('../buy')
+/* eslint-env jest */
+const pay = require('../pay')
 const mockKnex = require('mock-knex')
 const bsv = require('bsv')
 const atfinder = require('atfinder')
@@ -12,12 +13,12 @@ mockRes.status = jest.fn(() => mockRes)
 mockRes.json = jest.fn(() => mockRes)
 let queryTracker, validReq, validTx
 
-describe('buy', () => {
+describe('pay', () => {
   beforeEach(() => {
     jest.spyOn(console, 'error').mockImplementation(e => {
       throw e
     })
-    mockKnex.mock(buy.knex)
+    mockKnex.mock(pay.knex)
     queryTracker = require('mock-knex').getTracker()
     queryTracker.install()
 
@@ -55,11 +56,11 @@ describe('buy', () => {
   afterEach(() => {
     jest.clearAllMocks()
     queryTracker.uninstall()
-    mockKnex.unmock(buy.knex)
+    mockKnex.unmock(pay.knex)
   })
   it('Returns error if reference is missing', async () => {
     delete validReq.body.reference
-    await buy.func(validReq, mockRes)
+    await pay.func(validReq, mockRes)
     expect(mockRes.status).toHaveBeenCalledWith(400)
     expect(mockRes.json).toHaveBeenCalledWith(expect.objectContaining({
       status: 'error',
@@ -68,7 +69,7 @@ describe('buy', () => {
   })
   it('Returns error if rawTx is missing', async () => {
     delete validReq.body.rawTx
-    await buy.func(validReq, mockRes)
+    await pay.func(validReq, mockRes)
     expect(mockRes.status).toHaveBeenCalledWith(400)
     expect(mockRes.json).toHaveBeenCalledWith(expect.objectContaining({
       status: 'error',
@@ -88,7 +89,7 @@ describe('buy', () => {
         q.response([])
       }
     })
-    await buy.func(validReq, mockRes)
+    await pay.func(validReq, mockRes)
   })
   it('Returns error if no transaction found', async () => {
     queryTracker.on('query', (q, s) => {
@@ -98,7 +99,7 @@ describe('buy', () => {
         q.response([])
       }
     })
-    await buy.func(validReq, mockRes)
+    await pay.func(validReq, mockRes)
     expect(mockRes.status).toHaveBeenCalledWith(400)
     expect(mockRes.json).toHaveBeenCalledWith(expect.objectContaining({
       status: 'error',
@@ -113,7 +114,7 @@ describe('buy', () => {
         q.response([])
       }
     })
-    await buy.func(validReq, mockRes)
+    await pay.func(validReq, mockRes)
     expect(mockRes.status).toHaveBeenCalledWith(400)
     expect(mockRes.json).toHaveBeenCalledWith(expect.objectContaining({
       status: 'error',
@@ -126,11 +127,11 @@ describe('buy', () => {
     queryTracker.on('query', (q, s) => {
       if (s === 1) {
         q.response([validTx])
-      } else  {
+      } else {
         q.response([])
       }
     })
-    await buy.func(validReq, mockRes)
+    await pay.func(validReq, mockRes)
     expect(mockRes.status).toHaveBeenCalledWith(400)
     expect(mockRes.json).toHaveBeenCalledWith(expect.objectContaining({
       status: 'error',
@@ -147,7 +148,7 @@ describe('buy', () => {
         q.response([])
       }
     })
-    await buy.func(validReq, mockRes)
+    await pay.func(validReq, mockRes)
     expect(mockRes.status).toHaveBeenCalledWith(400)
     expect(mockRes.json).toHaveBeenCalledWith(expect.objectContaining({
       status: 'error',
@@ -172,7 +173,7 @@ describe('buy', () => {
         q.response([])
       }
     })
-    await buy.func(validReq, mockRes)
+    await pay.func(validReq, mockRes)
     expect(mockRes.status).toHaveBeenCalledWith(400)
     expect(mockRes.json).toHaveBeenCalledWith(expect.objectContaining({
       status: 'error',
@@ -188,7 +189,7 @@ describe('buy', () => {
         q.response([])
       }
     })
-    await buy.func(validReq, mockRes)
+    await pay.func(validReq, mockRes)
     expect(mockRes.status).toHaveBeenCalledWith(400)
     expect(mockRes.json).toHaveBeenCalledWith(expect.objectContaining({
       status: 'error',
@@ -228,7 +229,7 @@ describe('buy', () => {
         q.response([])
       }
     })
-    await buy.func(validReq, mockRes)
+    await pay.func(validReq, mockRes)
   })
   it('Returns bytes and note', async () => {
     queryTracker.on('query', (q, s) => {
@@ -238,7 +239,7 @@ describe('buy', () => {
         q.response([])
       }
     })
-    await buy.func(validReq, mockRes)
+    await pay.func(validReq, mockRes)
     expect(mockRes.status).toHaveBeenCalledWith(200)
     expect(mockRes.json).toHaveBeenCalledWith(expect.objectContaining({
       bytes: expect.any(String),
@@ -249,6 +250,6 @@ describe('buy', () => {
     queryTracker.on('query', (q, s) => {
       throw new Error('Failed')
     })
-    await expect(buy.func(validReq, mockRes)).rejects.toThrow()
+    await expect(pay.func(validReq, mockRes)).rejects.toThrow()
   })
 })

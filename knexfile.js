@@ -1,24 +1,23 @@
 require('dotenv').config()
 
-module.exports = {
-  production: {
-    client: process.env.KNEX_DB_CLIENT,
-    connection: process.env.KNEX_DB_CONNECTION
-      ? JSON.parse(process.env.KNEX_DB_CONNECTION)
-      : undefined,
-    useNullAsDefault: true,
-    migrations: {
-      directory: './src/migrations'
-    }
+const config = {
+  client: 'mysql',
+  connection: process.env.KNEX_DB_CONNECTION
+    ? JSON.parse(process.env.KNEX_DB_CONNECTION)
+    : undefined,
+  useNullAsDefault: true,
+  migrations: {
+    directory: './src/migrations'
   },
-  development: {
-    client: 'sqlite3',
-    connection: {
-      filename: process.env.DATABASE_FILENAME || './data/database.sqlite'
-    },
-    useNullAsDefault: true,
-    migrations: {
-      directory: './src/migrations'
-    }
+  pool: {
+    min: 0,
+    max: 7,
+    idleTimeoutMillis: 15000
   }
+}
+
+module.exports = {
+  development: config,
+  staging: config,
+  production: config
 }

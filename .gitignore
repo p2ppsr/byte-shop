@@ -1,10 +1,13 @@
 node_modules
-data/database.sqlite
+data/byteshop-mysql-data
 .env
+docker-compose.yml
+dispatch.yaml
 yarn-error.log
 yarn.lock
 public/index.html
 app.production.yaml
 app.staging.yaml
 .npmrc
-.DS_Store
+
+/example/public/

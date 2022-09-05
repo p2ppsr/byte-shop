@@ -2,18 +2,21 @@ require('dotenv').config()
 const express = require('express')
 const bodyparser = require('body-parser')
 const prettyjson = require('prettyjson')
-const routes = require('./routes')
-
-// This allows you to remotely debug your server in the cloud
-if (process.env.NODE_ENV !== 'development') {
+const { preAuthrite, postAuthrite } = require('./routes')
+const authrite = require('authrite-express')
+const {
+  NODE_ENV,
+  PORT,
+  SERVER_PRIVATE_KEY,
+  HOSTING_DOMAIN
+} = process.env
+if (NODE_ENV !== 'development') {
   require('@google-cloud/debug-agent').start({
     serviceContext: { enableCanary: false }
   })
 }
-
-const HTTP_PORT = process.env.PORT || process.env.HTTP_PORT || 8080
+const HTTP_PORT = PORT || process.env.HTTP_PORT || 8080
 const ROUTING_PREFIX = process.env.ROUTING_PREFIX || ''
-
 const app = express()
 app.use(bodyparser.json())
 
@@ -22,7 +25,7 @@ app.use((req, res, next) => {
   if (
     !req.secure &&
     req.get('x-forwarded-proto') !== 'https' &&
-    process.env.NODE_ENV !== 'development'
+    NODE_ENV !== 'development'
   ) {
     return res.redirect('https://' + req.get('host') + req.url)
   }
@@ -32,15 +35,18 @@ app.use((req, res, next) => {
 // This allows the API to be used when CORS is enforced
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*')
-  res.header(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept'
-  )
-  res.header('Access-Control-Allow-Methods', 'GET, OPTIONS, POST')
-  next()
+  res.header('Access-Control-Allow-Headers', '*')
+  res.header('Access-Control-Allow-Methods', '*')
+  res.header('Access-Control-Expose-Headers', '*')
+  res.header('Access-Control-Allow-Private-Network', 'true')
+  if (req.method === 'OPTIONS') {
+    res.send(200)
+  } else {
+    next()
+  }
 })
 
-// This is a simple API request logger
+// logger
 app.use((req, res, next) => {
   console.log('[' + req.method + '] <- ' + req._parsedUrl.pathname)
   const logObject = { ...req.body }
@@ -54,22 +60,32 @@ app.use((req, res, next) => {
   next()
 })
 
-// This makes the documentation site available
 app.use(express.static('public'))
 
-// This avoids issues with pre-flight requests
-app.options('*', (req, res) =>
-  res.status(200).json({
-    message: 'Send a POST request to see the results.'
-  })
-)
+// Unsecured pre-Authrite routes are added first
 
-// This adds all the API routes
-routes.forEach((route) => {
+// Cycle through pre-authrite routes
+preAuthrite.filter(x => x.unsecured).forEach((route) => {
   app[route.type](`${ROUTING_PREFIX}${route.path}`, route.func)
 })
 
-// This is the 404 route
+// Secured pre-Authrite routes are then added
+preAuthrite.filter(x => !x.unsecured).forEach((route) => {
+  app[route.type](`${ROUTING_PREFIX}${route.path}`, route.func)
+})
+
+// Authrite is enforced from here forward
+app.use(authrite.middleware({
+  serverPrivateKey: SERVER_PRIVATE_KEY,
+  baseUrl: HOSTING_DOMAIN
+}))
+
+// Secured, post-Authrite routes are added
+postAuthrite.filter(x => !x.unsecured).forEach((route) => {
+  app[route.type](`${ROUTING_PREFIX}${route.path}`, route.func)
+})
+
+// route not found error returned
 app.use((req, res) => {
   console.log('404', req.url)
   res.status(404).json({
@@ -80,5 +96,5 @@ app.use((req, res) => {
 
 // This starts the API server listening for requests
 app.listen(HTTP_PORT, () => {
-  console.log('ByteShop listening on port', HTTP_PORT)
+  console.log('Byte-Shop listening on port', HTTP_PORT)
 })

@@ -1,3 +1,4 @@
+/* eslint-env jest */
 const migrate = require('../migrate')
 
 jest.mock('knex', () => () => ({

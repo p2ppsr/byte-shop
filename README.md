@@ -8,35 +8,21 @@ Step right up! Buy your very own unique set of random bytes! For the low low pri
 
 ### Ok, what is this *REALLY*?
 
-This is an open-source example of a merchant running a server to accept SPV payments in Bitcoin over the internet in exchange for digital goods or services—in this case, pseudo-random bytes of data.
+This is an open-source example of a merchant running a server to accept SPV payments in Bitcoin over the internet in exchange for digital goods or services—in this case, pseudo-random bytes of data. This is a reference implementation of a simple Babbage app.
 
-It uses Paymail and the Babbage suite of tools. The merchant configures the server with their Paymail address, where they will receive their satoshis. The server proxies requests to Paymail, checking that the payments were accepted and furnishing the goods to the customer if so.
+It uses the Babbage suite of tools to peroform the purchase of the bytes. The buyer sends a request for a number of bytes to be purchased from the merchant. The merchant returns an invoice to the buyer for the number of bytes requested. Provided the buyer sends the merchant the correct payment, as detailed on the invoice, the merchant returns the bytes and a note thanking the buyer for their purchase.
 
-Wallets like MoneyButton and HandCash do not yet support accepting SPV payments with Paymail, but if you download [Babbage Desktop](https://projectbabbage.com), you will be able to use your Paymail to receive the money.
+## Setting Up
 
-## Spinning Up for Local Development
+This runs on the GCP(Google Cloud Platform) within Cloud Run (Docker) containers. You will need a GCP account using IAM, that includes running a database, and your GitHub Actions configured for your fork of this repo.
 
-To use this locally (such as when you are extending / modifying it, or adding features), you can follow these steps:
+In addition, you will need `gcloud` command line tools set up. You will need to run `gcloud auth login` and configure it to use the correct project. To do this, run `gcloud config configurations create your-cfg-name`, then `gcloud config set account your-email@domain.tld` and finally `gcloud config set project your-project-id`.
 
-1. Clone the repo onto your machine
-2. Run `npm i` to install dependencies
-3. Copy the `.env.example` file to a new file called `.env`
-4. Run `npm run dev` and the local ByteShop server will be available on port `8080`
-5. Optionally, change the Dojo URL, identity key and/or Paymail handle where payment is sent
+Create a Cloud SQL instance (MySQL is what has been tested) and create a new DB user. Also, create a new database inside the new instance. Make note of the username, password, host name and database name you want to use. Alternatively, you can use another database hosting solution.
 
-## Deploying to Google Cloud
+Go to the GCP console and select a region. Use the same region as your Cloud SQL instance for best performance. Once the GCP application has been created, go to Settings and add two custom domains: one for staging and one for production.
 
-This runs on the infinitely-scalable Google App Engine platform. You will need a database, an App Engine project and GitHub Actions configured for your fork of this repo.
-
-You will need `gcloud` command line tools set up. You will need to run `gcloud auth login` and configure it to use the correct project. To do this, run `gcloud config configurations create your-cfg-name`, then `gcloud config set account your-email@domain.tld` and finally `gcloud config set project your-project-id`.
-
-Create a Cloud SQL instance (MySQL is what has been tested) and create a new user. Also create a new database inside the new instance. Make note of the username, password, host name and database name you want to use. Alternatively, you can use another database hosting solution.
-
-Go to the App Engine page and select a region. Use the same region as your Cloud SQL instance for best performance. Once the App Engine application has been created, go to Settings and add two custom domains: one for staging and one for production.
-
-In the search bar at the top of the Google Cloud console, search for "app Engine Admin API" and select the API from the list of results. On the API page, click "Enable" so that the service account has permission to create new deployments of the App Engine application.
-
-Go to GitHub repository settings and populate the repository secrets defined in `.github/workflows/deploy.staging.yml` and `.github/workflows/deploy.production.yml`.
+Go to GitHub repository settings and populate the repository secrets defined in `.github/workflows/deploy.yml`.
 
 - STAGING_NODE_ENV is `staging`
 - PROD_NODE_ENV is `production`
@@ -48,13 +34,11 @@ Go to GitHub repository settings and populate the repository secrets defined in 
 - STAGING_KNEX_DB_CLIENT and PROD_KNEX_DB_CLIENT are both `mysql`
 - STAGING_MIGRATE_KEY and PROD_MIGRATE_KEY are the migration keys that can be used by the server administrator with the `/migrate` API endpoints to run new database migrations. Since staging and production use different databases, their migrations are handled separately, and different migration keys should be used for each.
 - STAGING_GCP_PROJECT_ID and PROD_GCP_PROJECT_ID are usually the same, unless you have different Google Cloud projects for each deployment. Set them to the project ID where App Engine is running.
-- STAGING_SERVER_PAYMAIL is where you want to receive your profits from the staging server.
-- PROD_SERVER_PAYMAIL is where you want to receive your profits from the production server. Feel free to set this ty `ty@tyweb.us` if you want to give me all of your profits :p (or for testing)
 - GCP_DEPLOY_CREDS is the text of the JSON file that you downloaded when you created the access key for the service account
 
-After this is done, write a commit and push it to the `production` branch. Check that the App Engine production deployment succeeded in GitHub Actions. After it works, pull your new commit into `master` and ensure that the staging deployment succeeds. You will need to deploy the production branch before the master branch, as the first App Engine service must always be `default`.
+After this is done, write a commit and push it to `master`. Check that both the GCP staging and production deployments succeeded in GitHub Actions.
 
-To get your custom domains to route to the right places, after your deploys are working, modify `dispatch.yaml` in your fork of the repo with the domains you set up earlier. Deploy the new routing rules from your loal terminal with `gcloud app deploy dispatch.yaml`. Commit the change to `master` and the staging deployment should run once more.
+Once you have successfully deployed your staging and production GCP applications, use your GCP console to 'Add Domains' so you can use your custom domains by pointing them to your newly deployed applications.
 
 Once your custom domains are working, you will need to migrate both the staging and production databases to create the schema after deployment. Use the `/migrate` API endpoints on both deployments with the migration keys you have configured.
 

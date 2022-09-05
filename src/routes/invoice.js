@@ -1,8 +1,13 @@
+const crypto = require('crypto')
+const bsv = require('bsv')
+const {
+  SERVER_PRIVATE_KEY,
+  NODE_ENV
+} = process.env
 const knex =
-  process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging'
+  NODE_ENV === 'production' || NODE_ENV === 'staging'
     ? require('knex')(require('../../knexfile.js').production)
     : require('knex')(require('../../knexfile.js').development)
-const createNewTransaction = require('../utils/createNewTransaction')
 
 module.exports = {
   type: 'post',
@@ -13,20 +18,20 @@ module.exports = {
     numberOfBytes: 'The number of random bytes to order. These are toilet paper, so that means a minimum of ten per customer. 100 satoshis each byte.'
   },
   exampleResponse: {
-    reference: 'fjsodf+s/4Ssje==',
-    outputs: [
-      {
-        amount: 1209,
-        outputScript: '76...88ac'
-      },
-      {
-        amount: 0,
-        outputScript: '006a...'
-      }
-    ]
+    status: 'success',
+    identityKey: 'sdjlasldfj',
+    message: 'Use /pay to submit the payment.',
+    amount: 1337,
+    orderID: 'asdfsdfsd='
   },
+  errors: [
+    'ERR_NO_BYTES',
+    'ERR_INVALID_BYTES',
+    'ERR_INTERNAL_PROCESSING_INVOICE'
+  ],
   func: async (req, res) => {
     try {
+      console.log('req.body:', req.body)
       const { numberOfBytes } = req.body
 
       // Handle missing bytes
@@ -69,24 +74,33 @@ module.exports = {
         })
       }
 
-      // Create a new transaction, the amount is 100 * the number of bytes
-      const { reference, outputs, fee } = await createNewTransaction({
-        amount: numberOfBytes * 100,
-        knex
+      const amount = numberOfBytes * 100
+
+      // Create a new transaction record
+      const orderID = crypto.randomBytes(32).toString('base64')
+      await knex('transaction').insert({
+        orderID: orderID,
+        amount,
+        identityKey: req.authrite.identityKey,
+        paid: false,
+        created_at: new Date(),
+        updated_at: new Date()
       })
 
-      // Return the reference number, fee and outputs
-      res.status(200).json({
-        reference,
-        outputs,
-        fee
+      // Return the required info to the sender
+      return res.status(200).json({
+        status: 'success',
+        message: 'Use /pay to submit the payment.',
+        identityKey: bsv.PrivateKey.fromHex(SERVER_PRIVATE_KEY).publicKey.toString(),
+        amount,
+        orderID
       })
     } catch (e) {
       console.error(e)
       return res.status(500).json({
         status: 'error',
-        code: 'ERR_INTERNAL',
-        description: 'An internal error has occurred.'
+        code: 'ERR_INTERNAL_PROCESSING_INVOICE',
+        description: 'An internal error has occurred while processing invoice.'
       })
     }
   }
