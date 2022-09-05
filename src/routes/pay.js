@@ -1,14 +1,9 @@
 const Ninja = require('utxoninja')
-const bsv = require('bsv')
-
 const {
-   DOJO_URL,
-   SERVER_PRIVATE_KEY,
-   NODE_ENV,
-   HOSTING_DOMAIN,
-   ROUTING_PREFIX
- } = process.env
-
+  DOJO_URL,
+  SERVER_PRIVATE_KEY,
+  NODE_ENV
+} = process.env
 const knex =
   NODE_ENV === 'production' || NODE_ENV === 'staging'
     ? require('knex')(require('../../knexfile.js').production)
@@ -16,27 +11,35 @@ const knex =
 
 module.exports = {
   type: 'post',
-  path: '/buy',
+  path: '/pay',
   knex,
   summary: 'Use this route to pay an invoice and actually buy the sorta-random bytes. You will receive back the bytes, one by one, in hexadecimal format. You need to pay with a valid SPV Envelope, which is kind of the whole point.',
   parameters: {
-    orderId: 'Unique client visible order record identifier returned in invoice.',
+    orderID: 'xyz',
     transaction: 'transaction envelope (rawTx, mapiResponses, inputs, proof), with additional outputs array containing key derivation information',
     'transaction.outputs': 'An array of outputs descriptors, each including vout, satoshis, derivationPrefix, and derivationSuffix',
-    description: 'Client friendly description of this transaction.'
+    description: 'Transaction description'
   },
   exampleResponse: {
+    status: 'success',
     bytes: 'deadbeef201912345678',
     note: '... (have to actually buy bytes to see what it says :p)'
   },
+  errors: [
+    'ERR_TRANSACTION_NOT_FOUND',
+    'ERR_ALREADY_PAID',
+    'ERR_PAYMENT_INVALID',
+    'ERR_INTERNAL_PAYMENT_PROCESSING'
+  ],
   func: async (req, res) => {
     try {
       // Find valid request transaction
       const [transaction] = await knex('transaction').where({
         identityKey: req.authrite.identityKey,
-        orderId: req.body.orderId
+        orderID: req.body.orderID
       })
-      // console.log('transaction:', transaction)
+
+      console.log('transaction:', transaction)
       if (!transaction) {
         return res.status(400).json({
           status: 'error',
@@ -44,6 +47,7 @@ module.exports = {
           description: 'A transaction for the specified request was not found!'
         })
       }
+
       if (transaction.paid) {
         return res.status(400).json({
           status: 'error',
@@ -52,28 +56,26 @@ module.exports = {
           orderID: transaction.orderID
         })
       }
-
       req.body.transaction.outputs = req.body.transaction.outputs.map(x => ({
         ...x,
         senderIdentityKey: req.authrite.identityKey
       }))
-
       const ninja = new Ninja({
         privateKey: SERVER_PRIVATE_KEY,
-        config: { dojoURL: DOJO_URL }
+        config: {
+          dojoURL: DOJO_URL
+        }
       })
 
       // Submit and verify the payment
-      const processedTransaction = await ninja.submitDirectTransaction({
+      const [processedTransaction] = await ninja.submitDirectTransaction({
         protocol: '3241645161d8',
         transaction: req.body.transaction,
         senderIdentityKey: req.authrite.identityKey,
         note: req.body.description,
         amount: transaction.amount
       })
-      // This is not an adequate failure test...
-      if (processedTransaction && processedTransaction.message)
-        console.log(`ninja.submitDirectTransaction message=${processedTransaction.message}`)
+      console.log('processedTransaction:', processedTransaction)
       if (!processedTransaction) {
         return res.status(400).json({
           status: 'error',
@@ -82,36 +84,43 @@ module.exports = {
         })
       }
 
-      const bytes = require('crypto').randomBytes(transaction.numberOfBytes)
-
       // Update transaction
       await knex('transaction').where({
         identityKey: req.authrite.identityKey,
-        orderID: req.body.orderId,
+        orderID: req.body.orderID,
         paid: false
+      }).update({
+        reference: processedTransaction.reference,
+        paid: true,
+        updated_at: new Date()
       })
-        .update({
-          reference: processedTransaction.reference,
-          paid: true,
-          txid: req.body.transaction.txid,
-          bytes,
-          updated_at: new Date()
-        })
 
+      // At this point, we know that the customer has paid.
+      // We can provide them with the bytes they have purchased.
+
+      // The number of bytes is 100x smaller than the number of satoshis
+      const bytes = require('crypto').randomBytes(transaction.amount / 100)
+      await knex('transaction').where({
+        identityKey: req.authrite.identityKey,
+        orderID: req.body.orderID,
+        paid: true
+      }).update({
+        bytes,
+        updated_at: new Date()
+      })
       return res.status(200).json({
+        status: 'success',
         bytes: bytes.toString('hex'),
-        note: `Thanks for doing business with the byte shop! By the way... have you ever heard of require("crypto").randomBytes(${transaction.numberOfBytes})?`
+        note: `Thanks for doing business with the byte shop! By the way... have you ever heard of require("cryoto").randomBytes(${transaction.amount / 100})?`
       })
-
     } catch (e) {
       console.error(e)
-      //if (global.Bugsnag) global.Bugsnag.notify(e)
+      if (global.Bugsnag) global.Bugsnag.notify(e)
       res.status(500).json({
         status: 'error',
         code: 'ERR_INTERNAL_PAYMENT_PROCESSING',
         description: 'An internal error has occurred.'
       })
-      return null
     }
   }
 }

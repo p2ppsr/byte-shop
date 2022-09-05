@@ -1,23 +1,31 @@
 #!/bin/bash
 
-# Create .env file
-echo "Generating .env file..."
-echo "NODE_ENV=$NODE_ENV" > .env
-echo "ROUTING_PREFIX=$ROUTING_PREFIX" >> .env
-echo "HOSTING_DOMAIN=$HOSTING_DOMAIN" >> .env
-echo "KNEX_DB_CONNECTION=$KNEX_DB_CONNECTION" >> .env
-echo "KNEX_DB_CLIENT=$KNEX_DB_CLIENT" >> .env
-echo "MIGRATE_KEY=$MIGRATE_KEY" >> .env
-echo "GCP_PROJECT_ID=$GCP_PROJECT_ID" >> .env
-echo "SERVER_PAYMAIL=$SERVER_PAYMAIL" >> .env
+echo "Creating $1"
+echo "apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: $SERVICE
+spec:
+  template:
+    spec:
+      timeoutSeconds: 3540
+      containers:
+      - image: $IMAGE
+        env:" > $1
 
-# Create deployment file with needed variables
-if [ $NODE_ENV = "production" ]; then
-  echo "Generating production GAE descriptor..."
-  echo "runtime: nodejs14" > app.production.yaml
-  echo "service: default" >> app.production.yaml
-else
-  echo "Generating staging GAE descriptor..."
-  echo "runtime: nodejs14" > app.staging.yaml
-  echo "service: staging" >> app.staging.yaml
-fi
+echo "Appending environment variables to $1"
+perl -E'
+  say "        - name: $_
+          value: \x27$ENV{$_}\x27" for @ARGV;
+' NODE_ENV \
+    MIGRATE_KEY \
+    KNEX_DB_CONNECTION \
+    KNEX_DB_CLIENT \
+    SERVER_PRIVATE_KEY \
+    GCP_STORAGE_CREDS \
+    GCP_PROJECT_ID \
+    GCP_BUCKET_NAME \
+    DOJO_URL >> $1
+
+echo "Built! Contents of $1:"
+cat $1

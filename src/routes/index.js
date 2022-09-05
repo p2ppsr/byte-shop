@@ -3,7 +3,7 @@ module.exports = {
     require('./migrate')
   ],
   postAuthrite: [
-    require('./invoice'),
-    require('./buy')
+    require('./pay'),
+    require('./invoice')
   ]
 }

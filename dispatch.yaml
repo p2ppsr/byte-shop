@@ -1,5 +1,9 @@
 dispatch:
-  - url: "staging-byteshop.babbage.systems/*"
+  - url: "staging.bytes.babbage.systems/*"
     service: staging
-  - url: "byteshop.babbage.systems/*"
+  - url: "bytes.babbage.systems/*"
+    service: default
+  - url: "staging-byte-shop.babbage.systems/*"
+    service: staging
+  - url: "byte-shop.babbage.systems/*"
     service: default
