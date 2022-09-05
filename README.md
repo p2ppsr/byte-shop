@@ -10,19 +10,19 @@ Step right up! Buy your very own unique set of random bytes! For the low low pri
 
 This is an open-source example of a merchant running a server to accept SPV payments in Bitcoin over the internet in exchange for digital goods or services—in this case, pseudo-random bytes of data. This is a reference implementation of a simple Babbage app.
 
-It uses the Babbage suite of tools to peroform the purchase of the bytes. The buyer sends a request for a number of bytes to be purchased. The merchant returns an invoice to the buyer for the number of bytes requested. Provided the buyer sends the merchant the correct payment as detailed on the invoice, the merchant returns the bytes and a note thanking the buyer for their purchase.
+It uses the Babbage suite of tools to peroform the purchase of the bytes. The buyer sends a request for a number of bytes to be purchased from the merchant. The merchant returns an invoice to the buyer for the number of bytes requested. Provided the buyer sends the merchant the correct payment, as detailed on the invoice, the merchant returns the bytes and a note thanking the buyer for their purchase.
 
 ## Setting Up
 
-This runs on the Google Cloud platform. You will need a Google Cloud account using IAM that includes running a database and GitHub Actions configured for your fork of this repo.
+This runs on the GCP(Google Cloud Platform) within Cloud Run (Docker) containers. You will need a GCP account using IAM, that includes running a database, and your GitHub Actions configured for your fork of this repo.
 
-You will need `gcloud` command line tools set up. You will need to run `gcloud auth login` and configure it to use the correct project. To do this, run `gcloud config configurations create your-cfg-name`, then `gcloud config set account your-email@domain.tld` and finally `gcloud config set project your-project-id`.
+In addition, you will need `gcloud` command line tools set up. You will need to run `gcloud auth login` and configure it to use the correct project. To do this, run `gcloud config configurations create your-cfg-name`, then `gcloud config set account your-email@domain.tld` and finally `gcloud config set project your-project-id`.
 
-Create a Cloud SQL instance (MySQL is what has been tested) and create a new user. Also create a new database inside the new instance. Make note of the username, password, host name and database name you want to use. Alternatively, you can use another database hosting solution.
+Create a Cloud SQL instance (MySQL is what has been tested) and create a new DB user. Also, create a new database inside the new instance. Make note of the username, password, host name and database name you want to use. Alternatively, you can use another database hosting solution.
 
-Go to the Google Cloud console and select a region. Use the same region as your Cloud SQL instance for best performance. Once the Google Cloud application has been created, go to Settings and add two custom domains: one for staging and one for production.
+Go to the GCP console and select a region. Use the same region as your Cloud SQL instance for best performance. Once the GCP application has been created, go to Settings and add two custom domains: one for staging and one for production.
 
-Go to GitHub repository settings and populate the repository secrets defined in `.github/workflows/deploy.staging.yml` and `.github/workflows/deploy.production.yml`.
+Go to GitHub repository settings and populate the repository secrets defined in `.github/workflows/deploy.yml`.
 
 - STAGING_NODE_ENV is `staging`
 - PROD_NODE_ENV is `production`
@@ -36,9 +36,9 @@ Go to GitHub repository settings and populate the repository secrets defined in 
 - STAGING_GCP_PROJECT_ID and PROD_GCP_PROJECT_ID are usually the same, unless you have different Google Cloud projects for each deployment. Set them to the project ID where App Engine is running.
 - GCP_DEPLOY_CREDS is the text of the JSON file that you downloaded when you created the access key for the service account
 
-After this is done, write a commit and push it to the `production` branch. Check that the Google Cloud production deployment succeeded in GitHub Actions. After it works, pull your new commit into `master` and ensure that the `staging` deployment succeeds. You will need to deploy the production branch before the master branch, as the first Google Cloud service must always be `default`.
+After this is done, write a commit and push it to `master`. Check that both the GCP staging and production deployments succeeded in GitHub Actions.
 
-Once you have successfully deployed your `staging` and `production` apps, use your Google Cloud console to 'Add Domains' so you can use your custom domains by pointing them to your newly deployed apps.
+Once you have successfully deployed your staging and production GCP applications, use your GCP console to 'Add Domains' so you can use your custom domains by pointing them to your newly deployed applications.
 
 Once your custom domains are working, you will need to migrate both the staging and production databases to create the schema after deployment. Use the `/migrate` API endpoints on both deployments with the migration keys you have configured.
 
