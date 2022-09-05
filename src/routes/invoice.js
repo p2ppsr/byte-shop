@@ -22,7 +22,7 @@ module.exports = {
     identityKey: 'sdjlasldfj',
     message: 'Use /pay to submit the payment.',
     amount: 1337,
-    ORDER_ID: 'asdfsdfsd='
+    orderID: 'asdfsdfsd='
   },
   errors: [
     'ERR_NO_BYTES',
@@ -77,9 +77,9 @@ module.exports = {
       const amount = numberOfBytes * 100
 
       // Create a new transaction record
-      const ORDER_ID = crypto.randomBytes(32).toString('base64')
+      const orderID = crypto.randomBytes(32).toString('base64')
       await knex('transaction').insert({
-        orderID: ORDER_ID,
+        orderID: orderID,
         amount,
         identityKey: req.authrite.identityKey,
         paid: false,
@@ -93,7 +93,7 @@ module.exports = {
         message: 'Use /pay to submit the payment.',
         identityKey: bsv.PrivateKey.fromHex(SERVER_PRIVATE_KEY).publicKey.toString(),
         amount,
-        ORDER_ID
+        orderID
       })
     } catch (e) {
       console.error(e)
