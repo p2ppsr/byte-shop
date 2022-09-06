@@ -68,7 +68,7 @@ module.exports = {
       })
 
       // Submit and verify the payment
-      const [processedTransaction] = await ninja.submitDirectTransaction({
+      const processedTransaction = await ninja.submitDirectTransaction({
         protocol: '3241645161d8',
         transaction: req.body.transaction,
         senderIdentityKey: req.authrite.identityKey,
