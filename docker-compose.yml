@@ -1,37 +1,36 @@
-#####
-### Project Babbage — Services for Local Development
-#####
 version: '3.8'
-networks:
-  babnet:
-    ipam:
-      config:
-        - subnet: 172.20.0.0/23
-
 services:
+  ## Backend API
+  byte-shop:
+    build: .
+    restart: always
+    ports:
+    - "3002:3002"
+    environment:
+      HOSTING_DOMAIN: 'http://localhost:3002'
+      PORT: 3002
+      SERVER_PRIVATE_KEY: '' # TODO (developer): Use your own funds.
+      KNEX_DB_CLIENT: mysql
+      KNEX_DB_CONNECTION: '{"port":3001,"host":"byte-shop-mysql","user":"root","password":"test","database":"bytes"}'
+      NODE_ENV: development
+      MIGRATE_KEY: 'my-grate-key'
 
-  ###
-  ## Standard MetaNet Services
-  ###
-
-  byteshop-mysql:
+  ## Backend database
+  byte-shop-mysql:
     image: "mysql:8.0"
     platform: linux/x86_64
-    hostname: 'byteshop-mysql'
+    hostname: 'byte-shop-mysql'
     command: 'mysqld --default-authentication-plugin=mysql_native_password --sync_binlog=0 --innodb_doublewrite=OFF  --innodb-flush-log-at-trx-commit=0 --innodb-flush-method=nosync'
     restart: always
     volumes:
-     - './data/byteshop-mysql-data:/var/lib/mysql'
+     - './data/byte-shop-mysql-data:/var/lib/mysql'
     environment:
       MYSQL_HOST: "127.0.0.1"
-      MYSQL_TCP_PORT: 3114
+      MYSQL_TCP_PORT: 3001
       MYSQL_ROOT_PASSWORD: "test"
       MYSQL_DATABASE: "bytes"
     ports:
-      - "3114:3114"
-    networks:
-      babnet:
-        ipv4_address: 172.20.1.3
+      - "3001:3001"
     healthcheck:
       test: ["CMD-SHELL", 'mysqladmin ping']
       interval: 10s
@@ -42,14 +41,11 @@ services:
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     links:
-    - byteshop-mysql
+    - byte-shop-mysql
     environment:
-      PMA_HOST: byteshop-mysql
-      PMA_PORT: 3114
+      PMA_HOST: byte-shop-mysql
+      PMA_PORT: 3001
       PMA_ARBITRARY: 1
     restart: always
     ports:
     - 8090:80
-    networks:
-    - babnet
-      

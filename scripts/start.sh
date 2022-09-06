@@ -7,7 +7,7 @@ then
   exit
 fi
 
-until nc -z -v -w30 byte-shop-mysql 3115
+until nc -z -v -w30 byte-shop-mysql 3001
 do
   echo "Waiting for database connection..."
   sleep 1

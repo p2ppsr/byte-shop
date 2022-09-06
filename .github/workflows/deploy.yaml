@@ -37,6 +37,7 @@ jobs:
           KNEX_DB_CLIENT: mysql
           MIGRATE_KEY: ${{ env.CURRENT_BRANCH == 'production' && secrets.PROD_MIGRATE_KEY || secrets.STAGING_MIGRATE_KEY }}
           SERVER_PRIVATE_KEY: ${{ env.CURRENT_BRANCH == 'production' && secrets.PROD_SERVER_PRIVATE_KEY || secrets.STAGING_SERVER_PRIVATE_KEY }}
+          HOSTING_DOMAIN: ${{ env.CURRENT_BRANCH == 'production' && secrets.PROD_HOSTING_DOMAIN || secrets.STAGING_HOSTING_DOMAIN }}
       - uses: google-github-actions/deploy-cloudrun@main
         with:
           credentials: ${{ secrets.gcp_deploy_creds }}

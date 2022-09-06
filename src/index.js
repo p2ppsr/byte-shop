@@ -10,11 +10,6 @@ const {
   SERVER_PRIVATE_KEY,
   HOSTING_DOMAIN
 } = process.env
-if (NODE_ENV !== 'development') {
-  require('@google-cloud/debug-agent').start({
-    serviceContext: { enableCanary: false }
-  })
-}
 const HTTP_PORT = PORT || process.env.HTTP_PORT || 8080
 const ROUTING_PREFIX = process.env.ROUTING_PREFIX || ''
 const app = express()
@@ -40,7 +35,7 @@ app.use((req, res, next) => {
   res.header('Access-Control-Expose-Headers', '*')
   res.header('Access-Control-Allow-Private-Network', 'true')
   if (req.method === 'OPTIONS') {
-    res.send(200)
+    res.sendStatus(200)
   } else {
     next()
   }
@@ -65,12 +60,7 @@ app.use(express.static('public'))
 // Unsecured pre-Authrite routes are added first
 
 // Cycle through pre-authrite routes
-preAuthrite.filter(x => x.unsecured).forEach((route) => {
-  app[route.type](`${ROUTING_PREFIX}${route.path}`, route.func)
-})
-
-// Secured pre-Authrite routes are then added
-preAuthrite.filter(x => !x.unsecured).forEach((route) => {
+preAuthrite.forEach((route) => {
   app[route.type](`${ROUTING_PREFIX}${route.path}`, route.func)
 })
 
@@ -80,8 +70,8 @@ app.use(authrite.middleware({
   baseUrl: HOSTING_DOMAIN
 }))
 
-// Secured, post-Authrite routes are added
-postAuthrite.filter(x => !x.unsecured).forEach((route) => {
+// Post-Authrite routes are added
+postAuthrite.forEach((route) => {
   app[route.type](`${ROUTING_PREFIX}${route.path}`, route.func)
 })
 

@@ -1,5 +1,6 @@
 node_modules
 data/byteshop-mysql-data
+data/byte-shop-mysql-data
 data/database.sqlite
 .env
 .DS_Store
