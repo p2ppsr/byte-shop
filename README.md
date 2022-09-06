@@ -14,13 +14,19 @@ It uses the Babbage suite of tools to peroform the purchase of the bytes. The bu
 
 ## Spinning Up
 
-Clone the repo with Docker installed, then run `docker compose up`
+Clone the repo with Docker installed.
+
+Generate a `SERVER_PRIVATE_KEY` (64 random hex digits, 256-bits) and put it into the `docker-compose.yml` file. This is the key that will receive Bitcoin when your server sells its random bytes.
+
+Run `docker compose up`
 - Your API will run on port **3001**
 - Your database will be available on port **3002**
   - Username: `root`
   - Password: `test`
   - Database: `bytes`
 - A web SQL database viewer (PHPMyAdmin) is on port **3003**
+
+To interact with this API, spin up a copy of the [Byte Shop UI](https://github.com/p2ppsr/byte-shop-ui) in parallel with this system.
 
 ## Deploying
 

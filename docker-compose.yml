@@ -48,4 +48,4 @@ services:
       PMA_ARBITRARY: 1
     restart: always
     ports:
-    - 8090:80
+    - 3003:80
