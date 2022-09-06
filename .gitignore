@@ -1,6 +1,8 @@
 node_modules
 data/byteshop-mysql-data
+data/database.sqlite
 .env
+.DS_Store
 docker-compose.yml
 dispatch.yaml
 yarn-error.log
@@ -8,6 +10,5 @@ yarn.lock
 public/index.html
 app.production.yaml
 app.staging.yaml
-.npmrc
 
 /example/public/

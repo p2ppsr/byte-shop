@@ -1,0 +1,43 @@
+name: Deployment
+on:
+  push:
+    branches:
+      - master
+      - production
+env:
+  CURRENT_BRANCH: ${{ github.ref_name =='production' && 'production' || 'master' }}
+  GCR_HOST: us.gcr.io
+  GOOGLE_PROJECT_ID: babbage-private
+  GCR_IMAGE_NAME: byte-shop
+jobs:
+  build:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+         ref: ${{ env.CURRENT_BRANCH }}
+      - name: Docker Layer Caching
+        uses: satackey/action-docker-layer-caching@v0.0.11
+      - uses: RafikFarhad/push-to-gcr-github-action@v4.1
+        with:
+          gcloud_service_key: ${{ secrets.DOCKER_REGISTRY_PUSH_KEY }}
+          registry: ${{ env.GCR_HOST }}
+          project_id: ${{ env.GOOGLE_PROJECT_ID }}
+          image_name: ${{ env.GCR_IMAGE_NAME }}
+          image_tag: ${{ env.CURRENT_BRANCH }}-${{ github.sha }}
+      - name: "Create service description file"
+        run: "./scripts/mkenv.sh service.${{ env.CURRENT_BRANCH }}.yaml"
+        env:
+          IMAGE: "${{ env.GCR_HOST }}/${{ env.GOOGLE_PROJECT_ID }}/${{ env.GCR_IMAGE_NAME }}:${{ env.CURRENT_BRANCH }}-${{ github.sha }}"
+          SERVICE: ${{ env.CURRENT_BRANCH =='production' && 'prod-byte-shop' || 'staging-byte-shop' }}
+          NODE_ENV: ${{ env.CURRENT_BRANCH == 'production' && 'production' || 'staging' }}
+          ROUTING_PREFIX: ${{ env.CURRENT_BRANCH == 'production' && secrets.PROD_ROUTING_PREFIX || secrets.STAGING_ROUTING_PREFIX }}
+          KNEX_DB_CONNECTION: ${{ env.CURRENT_BRANCH == 'production' && secrets.PROD_KNEX_DB_CONNECTION || secrets.STAGING_KNEX_DB_CONNECTION }}
+          KNEX_DB_CLIENT: mysql
+          MIGRATE_KEY: ${{ env.CURRENT_BRANCH == 'production' && secrets.PROD_MIGRATE_KEY || secrets.STAGING_MIGRATE_KEY }}
+          SERVER_PRIVATE_KEY: ${{ env.CURRENT_BRANCH == 'production' && secrets.PROD_SERVER_PRIVATE_KEY || secrets.STAGING_SERVER_PRIVATE_KEY }}
+      - uses: google-github-actions/deploy-cloudrun@main
+        with:
+          credentials: ${{ secrets.gcp_deploy_creds }}
+          metadata: "service.${{ env.CURRENT_BRANCH }}.yaml"

@@ -24,16 +24,9 @@ Go to the GCP console and select a region. Use the same region as your Cloud SQL
 
 Go to GitHub repository settings and populate the repository secrets defined in `.github/workflows/deploy.yml`.
 
-- STAGING_NODE_ENV is `staging`
-- PROD_NODE_ENV is `production`
-- STAGING_ROUTING_PREFIX and PROD_ROUTING_PREFIX are not needed unless you want them
-- STAGING_HOSTING_DOMAIN is the domain name you configured for staging
-- PROD_HOSTING_DOMAIN is the domain name you configured for production
 - STAGING_KNEX_DB_CONNECTION is a JSON object describing the connection to your staging database. For example, `{"port":3306,"host":"10.1.1.1","user":"yourstagingusername","password":"yourstagingpassword","database":"your_staging_db"}`
 - PROD_KNEX_DB_CONNECTION is a JSON object describing the connection to your production database. For example, `{"port":3306,"host":"10.1.1.1","user":"yourprodusername","password":"yourprodpassword","database":"your_prod_db"}`
-- STAGING_KNEX_DB_CLIENT and PROD_KNEX_DB_CLIENT are both `mysql`
 - STAGING_MIGRATE_KEY and PROD_MIGRATE_KEY are the migration keys that can be used by the server administrator with the `/migrate` API endpoints to run new database migrations. Since staging and production use different databases, their migrations are handled separately, and different migration keys should be used for each.
-- STAGING_GCP_PROJECT_ID and PROD_GCP_PROJECT_ID are usually the same, unless you have different Google Cloud projects for each deployment. Set them to the project ID where App Engine is running.
 - GCP_DEPLOY_CREDS is the text of the JSON file that you downloaded when you created the access key for the service account
 
 After this is done, write a commit and push it to `master`. Check that both the GCP staging and production deployments succeeded in GitHub Actions.

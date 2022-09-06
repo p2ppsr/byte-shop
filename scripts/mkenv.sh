@@ -22,9 +22,6 @@ perl -E'
     KNEX_DB_CONNECTION \
     KNEX_DB_CLIENT \
     SERVER_PRIVATE_KEY \
-    GCP_STORAGE_CREDS \
-    GCP_PROJECT_ID \
-    GCP_BUCKET_NAME \
     DOJO_URL >> $1
 
 echo "Built! Contents of $1:"
