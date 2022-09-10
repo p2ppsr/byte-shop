@@ -80,7 +80,8 @@ app.use((req, res) => {
   console.log('404', req.url)
   res.status(404).json({
     status: 'error',
-    error: 'Route not found.'
+    code: 'ERR_ROUTE_NOT_FOUND',
+    description: 'Route not found.'
   })
 })
 
