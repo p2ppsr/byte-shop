@@ -68,7 +68,7 @@ module.exports = {
       })
 
       // Submit and verify the payment
-      const processedTransaction
+      let processedTransaction
       try {
         processedTransaction = await ninja.submitDirectTransaction({
           protocol: '3241645161d8',
