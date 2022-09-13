@@ -79,7 +79,7 @@ module.exports = {
       // Create a new transaction record
       const orderID = crypto.randomBytes(32).toString('base64')
       await knex('transaction').insert({
-        orderID: orderID,
+        orderID,
         amount,
         identityKey: req.authrite.identityKey,
         paid: false,
