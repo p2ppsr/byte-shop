@@ -39,7 +39,6 @@ module.exports = {
         orderID: req.body.orderID
       })
 
-      console.log('transaction:', transaction)
       if (!transaction) {
         return res.status(400).json({
           status: 'error',
@@ -86,7 +85,6 @@ module.exports = {
           outputIndex: e.outputIndex
         })
       }
-      console.log('processedTransaction:', processedTransaction)
       if (!processedTransaction) {
         return res.status(400).json({
           status: 'error',
@@ -110,7 +108,15 @@ module.exports = {
       // We can provide them with the bytes they have purchased.
 
       // The number of bytes is 100x smaller than the number of satoshis
-      const bytes = require('crypto').randomBytes(transaction.amount / 100)
+      let bytes = require('crypto')
+        .randomBytes(transaction.amount / 100)
+        .toString('hex')
+      
+      // For cool bytes, prefix with 1337
+      if (transaction.cool) {
+        bytes = '1337' + bytes
+      }
+      
       await knex('transaction').where({
         identityKey: req.authrite.identityKey,
         orderID: req.body.orderID,
@@ -121,7 +127,7 @@ module.exports = {
       })
       return res.status(200).json({
         status: 'success',
-        bytes: bytes.toString('hex'),
+        bytes,
         note: `Thanks for doing business with the byte shop! By the way... have you ever heard of require("cryoto").randomBytes(${transaction.amount / 100})?`
       })
     } catch (e) {

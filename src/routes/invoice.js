@@ -15,14 +15,16 @@ module.exports = {
   knex,
   summary: 'Use this route to create an invoice for the purchase of some bytes. The server will respond with a reference number and some Bitcoin transaction output scripts, which you should include in a transaction that pays the invoice.',
   parameters: {
-    numberOfBytes: 'The number of random bytes to order. These are toilet paper, so that means a minimum of ten per customer. 100 satoshis each byte.'
+    numberOfBytes: 'The number of random bytes to order. These are toilet paper, so that means a minimum of ten per customer. 100 satoshis each byte.',
+    cool: 'A boolean indicating whether you request cool bytes. If you request cool bytes, you must also present an Authrite Cool Person Certificate'
   },
   exampleResponse: {
     status: 'success',
     identityKey: 'sdjlasldfj',
     message: 'Use /pay to submit the payment.',
     amount: 1337,
-    orderID: 'asdfsdfsd='
+    orderID: 'asdfsdfsd=',
+    cool: 'Boolean indicating whether cool bytes were invoiced'
   },
   errors: [
     'ERR_NO_BYTES',
@@ -31,7 +33,6 @@ module.exports = {
   ],
   func: async (req, res) => {
     try {
-      console.log('req.body:', req.body)
       const { numberOfBytes } = req.body
 
       // Handle missing bytes
@@ -74,6 +75,45 @@ module.exports = {
         })
       }
 
+
+      // If this person is requesting cool bytes, they must have a cool person 
+      // certificate.
+      let coolBytes = false
+      if (req.body.cool === true) {
+        // A function to reject the request if the certificate is invalid
+        const invalidCert = () => res.status(400).json({
+          status: 'error',
+          code: 'ERR_NOT_COOL_ENOUGH',
+          description: 'You require a Cool Person Certificate from CoolCert to buy Cool Bytes from the Byte Shop. Please obtain one at the following URL before continuing. https://coolcert-ui.babbage.systems',
+          coolcertURL: 'https://coolcert-ui.babbage.systems'
+        })
+
+        // Because only one certificate type and certifier were requested in the requestedCertificateSet, we can assume that at most one certificate was provided with this request. We check its validity here.
+        if (req.authrite.certificates.length !== 1) {
+          return invalidCert()
+        }
+
+        let cert = req.authrite.certificates[0]
+        // The certificate must be a valid certificate with the expected 
+        // certifier and type
+        if (
+          cert.type !== 'AGfk/WrT1eBDXpz3mcw386Zww2HmqcIn3uY6x4Af1eo=' ||
+          cert.certifier !== '0247431387e513406817e5e8de00901f8572759012f5ed89b33857295bcc2651f8'
+        ) {
+          return invalidCert()
+        }
+
+        // The "cool" field must be presented, decrypted and valid
+        if (
+          !cert.decryptedFields.cool ||
+          cert.decryptedFields.cool !== 'true'
+        ) {
+          return invalidCert()
+        }
+
+        coolBytes = true
+      }
+
       const amount = numberOfBytes * 100
 
       // Create a new transaction record
@@ -83,6 +123,7 @@ module.exports = {
         amount,
         identityKey: req.authrite.identityKey,
         paid: false,
+        cool: coolBytes,
         created_at: new Date(),
         updated_at: new Date()
       })
@@ -93,7 +134,8 @@ module.exports = {
         message: 'Use /pay to submit the payment.',
         identityKey: bsv.PrivateKey.fromHex(SERVER_PRIVATE_KEY).publicKey.toString(),
         amount,
-        orderID
+        orderID,
+        cool: coolBytes
       })
     } catch (e) {
       console.error(e)
