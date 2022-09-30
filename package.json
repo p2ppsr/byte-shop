@@ -9,7 +9,6 @@
   "license": "Open BSV License",
   "dependencies": {
     "authrite-express": "^0.2.3",
-    "authrite-js": "^0.2.6",
     "body-parser": "^1.19.0",
     "bsv": "^1.5.6",
     "dotenv": "^8.2.0",
