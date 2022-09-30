@@ -34,7 +34,7 @@
       <h2>Endpoint Documentation</h2>
         <% for (let i in routes) { %>
         <h3>
-          <b class='method'><%= routes[i].type %></b> https://<%= HOSTING_DOMAIN %><%= ROUTING_PREFIX %><%= routes[i].path %>
+          <b class='method'><%= routes[i].type %></b> <%= HOSTING_DOMAIN %><%= ROUTING_PREFIX %><%= routes[i].path %>
         </h3>
         <p>
           <%= routes[i].summary %>
