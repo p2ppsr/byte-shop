@@ -16,7 +16,7 @@
     "knex": "^2.0.0",
     "mysql": "^2.18.1",
     "prettyjson": "^1.2.1",
-    "utxoninja": "^0.2.33"
+    "utxoninja": "^0.2.38"
   },
   "scripts": {
     "start": "node src/index.js",
