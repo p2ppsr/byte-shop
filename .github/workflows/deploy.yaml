@@ -15,10 +15,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-        with:
-         ref: ${{ env.CURRENT_BRANCH }}
-      - name: Docker Layer Caching
-        uses: satackey/action-docker-layer-caching@v0.0.11
       - uses: RafikFarhad/push-to-gcr-github-action@v4.1
         with:
           gcloud_service_key: ${{ secrets.DOCKER_REGISTRY_PUSH_KEY }}
