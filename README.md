@@ -2,6 +2,8 @@
 
 A Pedagogical SPV Example
 
+Also check out the [Byte Shop User Interface frontend](https://github.com/p2ppsr/byte-shop-ui)!
+
 ## What Is This?
 
 Step right up! Buy your very own unique set of random bytes! For the low low price of only 100 satoshis each, we are selling bytes of random data. Minimum 10 per order. Exclusions apply. Batteries not included. Made in China, just kidding not really. **Must pay in BSV with FULL SPV, yes really**!
