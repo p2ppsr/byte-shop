@@ -34,7 +34,9 @@ jobs:
           SERVER_PRIVATE_KEY: ${{ env.CURRENT_BRANCH == 'production' && secrets.PROD_SERVER_PRIVATE_KEY || secrets.STAGING_SERVER_PRIVATE_KEY }}
           HOSTING_DOMAIN: ${{ env.CURRENT_BRANCH == 'production' && secrets.PROD_HOSTING_DOMAIN || secrets.STAGING_HOSTING_DOMAIN }}
           DOJO_URL: ${{ env.CURRENT_BRANCH == 'production' && secrets.PROD_DOJO_URL || secrets.STAGING_DOJO_URL }}
-      - uses: google-github-actions/deploy-cloudrun@main
+      - uses: google-github-actions/auth@v1
         with:
-          credentials: ${{ secrets.gcp_deploy_creds }}
+          credentials_json: ${{ secrets.gcp_deploy_creds }}
+      - uses: google-github-actions/deploy-cloudrun@v0
+        with:
           metadata: "service.${{ env.CURRENT_BRANCH }}.yaml"
