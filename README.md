@@ -2,6 +2,10 @@
 
 A Pedagogical SPV Example
 
+A Stageline ("testnet") deployment of this repository is available at [https://staging-byte-shop.babbage.systems](https://staging-byte-shop.babbage.systems)
+
+Cool Bytes can be purchased if you have a [CoolCert](https://github.com/p2ppsr/coolcert) certificate.
+
 Also check out the [Byte Shop User Interface frontend](https://github.com/p2ppsr/byte-shop-ui)!
 
 ## What Is This?
