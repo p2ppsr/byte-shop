@@ -1,7 +1,7 @@
 /* eslint-env jest */
 const pay = require('../pay')
 const mockKnex = require('mock-knex')
-const bsv = require('bsv')
+const bsv = require('babbage-bsv')
 const atfinder = require('atfinder')
 
 const { SERVER_PAYMAIL, HOSTING_DOMAIN } = process.env

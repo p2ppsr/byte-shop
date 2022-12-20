@@ -1,5 +1,5 @@
 const crypto = require('crypto')
-const bsv = require('bsv')
+const bsv = require('babbage-bsv')
 const {
   SERVER_PRIVATE_KEY,
   NODE_ENV
@@ -98,7 +98,7 @@ module.exports = {
         // certifier and type
         if (
           cert.type !== 'AGfk/WrT1eBDXpz3mcw386Zww2HmqcIn3uY6x4Af1eo=' ||
-          cert.certifier !== '0447431387e513406817e5e8de00901f8572759012f5ed89b33857295bcc2651f890b13455f0b59c7b75897033e7ae260834a2397e7c316a0fd21e35e8d81ddd34'
+          cert.certifier !== '0220529dc803041a83f4357864a09c717daa24397cf2f3fc3a5745ae08d30924fd'
         ) {
           return invalidCert()
         }
