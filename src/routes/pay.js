@@ -128,7 +128,7 @@ module.exports = {
       return res.status(200).json({
         status: 'success',
         bytes,
-        note: `Thanks for doing business with the byte shop! By the way... have you ever heard of require("cryoto").randomBytes(${transaction.amount / 100})?`
+        note: `Thanks for doing business with the byte shop! By the way... have you ever heard of require("crypto").randomBytes(${transaction.amount / 100})?`
       })
     } catch (e) {
       console.error(e)
