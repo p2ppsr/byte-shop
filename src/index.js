@@ -80,7 +80,7 @@ app.use(authrite.middleware({
     },
     // Provide a list of certifiers you trust. Here, we are trusting
     // CoolCert, the CA that issues Cool Person Certificates.
-    certifiers: ['0220529dc803041a83f4357864a09c717daa24397cf2f3fc3a5745ae08d30924fd']
+    certifiers: ['0220529dc803041a83f4357864a09c717daa24397cf2f3fc3a5745ae08d30924fd', '0247431387e513406817e5e8de00901f8572759012f5ed89b33857295bcc2651f8']
   }
 }))
 
