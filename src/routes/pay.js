@@ -1,4 +1,4 @@
-const Ninja = require('utxoninja')
+const { Ninja } = require('ninja-base')
 const {
   DOJO_URL,
   SERVER_PRIVATE_KEY,

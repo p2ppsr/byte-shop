@@ -9,14 +9,14 @@
   "license": "Open BSV License",
   "dependencies": {
     "authrite-express": "^0.2.4",
-    "body-parser": "^1.19.0",
     "babbage-bsv": "^0.1.1",
+    "body-parser": "^1.19.0",
     "dotenv": "^8.2.0",
     "express": "^5.0.0-beta.1",
     "knex": "^2.0.0",
     "mysql": "^2.18.1",
-    "prettyjson": "^1.2.1",
-    "utxoninja": "^0.2.38"
+    "ninja-base": "^0.2.24",
+    "prettyjson": "^1.2.1"
   },
   "scripts": {
     "start": "node src/index.js",
