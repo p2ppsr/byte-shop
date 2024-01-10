@@ -8,14 +8,14 @@
   "author": "Peer-to-peer Privacy Systems Research, LLC",
   "license": "Open BSV License",
   "dependencies": {
-    "authrite-express": "^0.3.19",
+    "authrite-express": "^0.3.20",
     "babbage-bsv": "^0.2.4",
     "body-parser": "^1.19.0",
     "dotenv": "^8.2.0",
     "express": "^5.0.0-beta.1",
     "knex": "^2.5.1",
     "mysql": "^2.18.1",
-    "ninja-base": "^0.2.115",
+    "ninja-base": "^0.2.116",
     "prettyjson": "^1.2.1"
   },
   "scripts": {
