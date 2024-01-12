@@ -15,7 +15,7 @@
     "express": "^5.0.0-beta.1",
     "knex": "^2.5.1",
     "mysql": "^2.18.1",
-    "ninja-base": "^0.2.119",
+    "ninja-base": "^0.2.120",
     "prettyjson": "^1.2.1"
   },
   "scripts": {
