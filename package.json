@@ -1,7 +1,7 @@
 {
   "name": "byte-shop",
   "description": "A Pedagogical SPV Implementation",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "private": true,
   "main": "src/index.js",
   "repository": "https://github.com/p2ppsr/byte-shop",
