@@ -41,3 +41,12 @@ You can see some brief guidance on [deploying this server with Google Cloud Run]
 ## License
 
 The license for the code in this repository is the Open BSV License.
+
+## Node security maintenance (2026-10-22)
+
+The retained image recipe uses Node.js22.23.4, the committed dependency lock
+and the local Knex executable. The historical automatic Cloud Run deployment
+is retired; future service restoration requires a current documented owner and
+a separately validated release. CI performs qualification without cloud
+credentials, service creation or financial writes. Historical examples do not
+establish a current public deployment.
