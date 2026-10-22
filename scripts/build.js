@@ -2,6 +2,8 @@ const ejs = require('ejs')
 const fs = require('fs')
 require('dotenv').config()
 
+fs.mkdirSync('public', { recursive: true })
+
 ejs.renderFile(
   'src/templates/documentation.ejs',
   {
